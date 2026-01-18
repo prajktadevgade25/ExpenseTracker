@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">ExpenseTracker</string>
     <string name="default_web_client_id">616747972001-d1rfh5vv0c4na1jsmmtt1utsch3417e2.apps.googleusercontent.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="transactions">Transactions</string>
+    <string name="categories">Categories</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
 </resources>
