@@ -23,4 +23,13 @@ interface TransactionDao {
 
     @Update
     suspend fun updateTransaction(transaction: TransactionEntity)
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type='INCOME'")
+    fun getTotalIncome(): Flow<Double?>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type='EXPENSE'")
+    fun getTotalExpense(): Flow<Double?>
+
+    @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT 5")
+    fun getRecentTransactions(): Flow<List<TransactionEntity>>
 }
