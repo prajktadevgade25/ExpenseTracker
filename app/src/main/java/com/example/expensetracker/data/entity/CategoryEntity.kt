@@ -8,5 +8,5 @@ data class CategoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val color: Int,
-    val iconRes: Int
+    val iconRes: Int = 0
 )
