@@ -1,5 +1,6 @@
 package com.example.expensetracker.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +9,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.R
+import com.example.expensetracker.activity.AddIncomeActivity
+import com.example.expensetracker.activity.DashboardActivity
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.FragmentHomeBinding
@@ -15,7 +18,7 @@ import com.example.expensetracker.ui.transaction.TransactionAdapter
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var db: AppDatabase
@@ -26,7 +29,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding = FragmentHomeBinding.bind(view)
         db = AppDatabase.getInstance(requireContext())
-
+        // Attach click listener
+        binding.lnrAddIncome.setOnClickListener(this)
+        binding.lnrAddExpense.setOnClickListener(this)
         adapter = TransactionAdapter(mutableListOf(), object :
             TransactionAdapter.TransactionListener {
             override fun onEdit(transaction: TransactionEntity) {}
@@ -69,6 +74,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
             }.collect {
                 adapter.updateData(it)
+            }
+        }
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {   // ✅ correct
+            R.id.lnrAddIncome -> {
+                val intent = Intent(requireContext(), AddIncomeActivity::class.java)
+                intent.putExtra("TYPE", "INCOME")
+                startActivity(intent)
+            }
+            R.id.lnrAddExpense -> {
+                val intent = Intent(requireContext(), AddIncomeActivity::class.java)
+                intent.putExtra("TYPE", "EXPENSE")
+                startActivity(intent)
             }
         }
     }
