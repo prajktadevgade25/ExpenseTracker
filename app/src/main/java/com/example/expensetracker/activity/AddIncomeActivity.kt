@@ -38,20 +38,10 @@ import java.util.Locale
  */
 class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityAddIncomeBinding
-    private var type: String = getString(R.string.income)
+    lateinit var type: String
+    lateinit var defaultCategories: Set<String>
     private lateinit var db: AppDatabase
     private var selectedCategoryId: Int? = null
-
-    /**
-     * List of default categories that cannot be deleted by user.
-     */
-    private val defaultCategories = setOf(
-        getString(R.string.salary),
-        getString(R.string.gift),
-        getString(R.string.refund),
-        getString(R.string.investment),
-        getString(R.string.other)
-    )
 
     /**
      * Initializes the activity.
@@ -67,6 +57,18 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         enableEdgeToEdge()
         binding = ActivityAddIncomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        type = getString(R.string.income)
+
+        /**
+         * List of default categories that cannot be deleted by user.
+         */
+        defaultCategories = setOf(
+            getString(R.string.salary),
+            getString(R.string.gift),
+            getString(R.string.refund),
+            getString(R.string.investment),
+            getString(R.string.other)
+        )
         db = AppDatabase.getInstance(this)
         observeCategories()
 
