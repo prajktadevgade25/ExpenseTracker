@@ -1,5 +1,6 @@
 package com.example.expensetracker.activity
 
+import android.app.TimePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -20,6 +21,9 @@ import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityAddIncomeBinding
@@ -60,6 +64,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         binding.btnSaveIncome.setOnClickListener(this)
         binding.tvAddCategory.setOnClickListener(this)
         binding.tvDeleteCategory.setOnClickListener(this)
+        binding.lnrDate.setOnClickListener(this)
     }
     private fun saveTransaction() {
         val amount = binding.etAmount.text.toString().toDoubleOrNull() ?: return
@@ -104,11 +109,30 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
 
         dialog.show()
     }
+    private val defaultCategories = setOf(
+        "Salary",
+        "Gift",
+        "Refund",
+        "Investment",
+        "Other"
+    )
+
     private fun showDeleteCategoryDialog() {
         lifecycleScope.launch {
             val categories = db.categoryDao().getAllCategories().first()
 
-            if (categories.isEmpty()) return@launch
+            // remove default categories
+            val deletableCategories = categories.filter {
+                it.name !in defaultCategories
+            }
+
+            if (deletableCategories.isEmpty()) {
+                AlertDialog.Builder(this@AddIncomeActivity)
+                    .setMessage("No custom categories to delete")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return@launch
+            }
 
             val dialogView = layoutInflater.inflate(R.layout.dialog_delete_category, null)
             val spinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinnerCategories)
@@ -118,23 +142,19 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             val adapter = android.widget.ArrayAdapter(
                 this@AddIncomeActivity,
                 android.R.layout.simple_spinner_item,
-                categories.map { it.name }
+                deletableCategories.map { it.name }
             )
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
 
             val dialog = AlertDialog.Builder(this@AddIncomeActivity)
                 .setView(dialogView)
-                .setCancelable(false)
                 .create()
 
-            btnCancel.setOnClickListener {
-                dialog.dismiss()
-            }
+            btnCancel.setOnClickListener { dialog.dismiss() }
 
             btnDelete.setOnClickListener {
-                val selectedIndex = spinner.selectedItemPosition
-                val selectedCategory = categories[selectedIndex]
+                val selectedCategory = deletableCategories[spinner.selectedItemPosition]
 
                 lifecycleScope.launch(Dispatchers.IO) {
                     db.categoryDao().deleteCategory(selectedCategory)
@@ -151,8 +171,44 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             R.id.btnSaveIncome -> saveTransaction()
             R.id.tvAddCategory -> showAddCategoryDialog()
             R.id.tvDeleteCategory -> showDeleteCategoryDialog()
+            R.id.lnrDate -> showDatePicker()
         }
     }
+
+    private fun showDatePicker() {
+
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select date")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        picker.show(supportFragmentManager, "DATE_PICKER")
+
+        picker.addOnPositiveButtonClickListener { selectedDateMillis ->
+            showTimePicker(selectedDateMillis)
+        }
+    }
+    private fun showTimePicker(selectedDateMillis: Long) {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = selectedDateMillis
+
+        val timePicker = TimePickerDialog(
+            this,
+            { _, hour, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, minute)
+
+                val sdf = SimpleDateFormat("EEE, MMM d, h:mm a", Locale.getDefault())
+                binding.tvDateTime.text = sdf.format(calendar.time)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
+        )
+
+        timePicker.show()
+    }
+
 
     private fun observeCategories() {
         lifecycleScope.launch {

@@ -131,14 +131,20 @@ class DashboardActivity : AppCompatActivity() {
             val defaultCategories = listOf(
                 CategoryEntity(
                     name = "Salary", iconRes = R.drawable.ic_food, color = Color.GREEN
-                ), CategoryEntity(
+                ),
+                CategoryEntity(
                     name = "Gift", iconRes = R.drawable.ic_shopping, color = Color.MAGENTA
-                ), CategoryEntity(
+                ),
+                CategoryEntity(
                     name = "Refund", iconRes = R.drawable.ic_travel, color = Color.CYAN
-                ), CategoryEntity(
+                ),
+                CategoryEntity(
                     name = "Investment", iconRes = R.drawable.ic_bill, color = Color.YELLOW
+                ),
+                CategoryEntity(
+                    name = "Other", iconRes = R.drawable.ic_bill, color = Color.YELLOW
+                ),
                 )
-            )
 
             db.categoryDao().insertAll(defaultCategories)
 
