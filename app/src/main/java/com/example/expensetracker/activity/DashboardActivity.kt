@@ -141,28 +141,28 @@ class DashboardActivity : AppCompatActivity() {
             val defaultCategories = listOf(
                 CategoryEntity(
                     name = getString(R.string.salary),
-                    iconRes = R.drawable.ic_food,
+                    iconRes = R.drawable.ic_money,
                     color = Color.GREEN
                 ),
                 CategoryEntity(
                     name = getString(R.string.gift),
-                    iconRes = R.drawable.ic_shopping,
+                    iconRes = R.drawable.ic_gift,
                     color = Color.MAGENTA
                 ),
                 CategoryEntity(
                     name = getString(R.string.refund),
-                    iconRes = R.drawable.ic_travel,
+                    iconRes = R.drawable.ic_refund,
                     color = Color.CYAN
                 ),
                 CategoryEntity(
                     name = getString(R.string.investment),
-                    iconRes = R.drawable.ic_bill,
+                    iconRes = R.drawable.ic_investment,
                     color = Color.YELLOW
                 ),
                 CategoryEntity(
                     name = getString(R.string.other),
-                    iconRes = R.drawable.ic_bill,
-                    color = Color.YELLOW
+                    iconRes = R.drawable.ic_other,
+                    color = Color.DKGRAY
                 ),
             )
 

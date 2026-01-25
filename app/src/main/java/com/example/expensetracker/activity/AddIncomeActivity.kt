@@ -214,8 +214,8 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
                     db.categoryDao().insertCategory(
                         CategoryEntity(
                             name = categoryName,
-                            color = Color.RED,
-                            iconRes = R.drawable.ic_food,
+                            color = Color.LTGRAY,
+                            iconRes = R.drawable.ic_other,
                         )
                     )
                 }
