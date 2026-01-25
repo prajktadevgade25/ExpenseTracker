@@ -109,45 +109,11 @@
 
     <!-- Chips -->
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:singleSelection="true">
-
-        <com.google.android.material.chip.Chip
-            android:text="Salary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.chip.Chip
-            android:text="Freelance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.chip.Chip
-            android:text="Gift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.google.android.material.chip.Chip
-            android:text="Refund"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.chip.Chip
-            android:text="Investment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <com.google.android.material.chip.Chip
-            android:text="Other"
-            app:chipIcon="@drawable/ic_check"
-            app:chipIconVisible="true"
-            android:checked="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.chip.ChipGroup>
-
+        app:singleSelection="true" />
     <!-- Date & Time -->
     <LinearLayout
         android:layout_width="match_parent"
