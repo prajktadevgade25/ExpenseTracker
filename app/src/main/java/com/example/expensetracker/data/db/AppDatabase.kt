@@ -24,10 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(
                     context.applicationContext, AppDatabase::class.java, "expense_db"
-                )
-                    .fallbackToDestructiveMigration()
-                    /*addMigrations(MIGRATION_1_2)*/
-                    .build()
+                ).fallbackToDestructiveMigration()/*addMigrations(MIGRATION_1_2)*/.build()
 
             }
             return INSTANCE!!

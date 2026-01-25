@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
+import com.example.expensetracker.R
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.ItemTransactionBinding
 import java.text.SimpleDateFormat
-import java.util.*
-import com.example.expensetracker.R
+import java.util.Locale
 
 class TransactionAdapter(
     private val list: MutableList<Pair<TransactionEntity, CategoryEntity>>,
@@ -20,6 +20,7 @@ class TransactionAdapter(
         fun onEdit(transaction: TransactionEntity)
         fun onDelete(transaction: TransactionEntity)
     }
+
     inner class ViewHolder(val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root)
 
@@ -32,18 +33,17 @@ class TransactionAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val (transaction, category) = list[position]
+        val (transaction, _) = list[position]
 
         holder.binding.tvTitle.text = transaction.title
 //        holder.binding.imgIcon.setImageResource(category.iconRes)
 //        holder.binding.imgIcon.setColorFilter(category.color)
 
-        val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 //        holder.binding.tvDate.text = sdf.format(Date(transaction.date))
 
-        holder.binding.tvAmount.text =
-            if (transaction.type == "EXPENSE") "- ₹${transaction.amount}"
-            else "+ ₹${transaction.amount}"
+        holder.binding.tvAmount.text = if (transaction.type == "EXPENSE") "- ₹${transaction.amount}"
+        else "+ ₹${transaction.amount}"
 
         holder.binding.tvAmount.setTextColor(
             if (transaction.type == "EXPENSE") Color.RED else Color.GREEN
@@ -58,10 +58,12 @@ class TransactionAdapter(
                         listener.onEdit(transaction)
                         true
                     }
+
                     R.id.action_delete -> {
                         listener.onDelete(transaction)
                         true
                     }
+
                     else -> false
                 }
             }

@@ -99,7 +99,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
-                Log.e("GOOGLE_LOGIN", "Google sign-in failed", e)
+                Log.e(
+                    getString(R.string.google_login),
+                    getString(R.string.google_sign_in_failed),
+                    e
+                )
             }
         }
     }
@@ -114,10 +118,14 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
-                Log.d("GOOGLE_LOGIN", "Login success: ${auth.currentUser?.email}")
+                Log.d(getString(R.string.google_login), "Login success: ${auth.currentUser?.email}")
                 navigateToDashboard()
             } else {
-                Log.e("GOOGLE_LOGIN", "Firebase auth failed", task.exception)
+                Log.e(
+                    getString(R.string.google_login),
+                    getString(R.string.firebase_auth_failed),
+                    task.exception
+                )
             }
         }
     }

@@ -9,14 +9,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.expensetracker.fragment.CategoryFragment
-import com.example.expensetracker.fragment.HomeFragment
-import com.example.expensetracker.fragment.SettingsFragment
-import com.example.expensetracker.fragment.TransactionFragment
 import com.example.expensetracker.R
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.databinding.ActivityDashboardBinding
+import com.example.expensetracker.fragment.CategoryFragment
+import com.example.expensetracker.fragment.HomeFragment
+import com.example.expensetracker.fragment.SettingsFragment
+import com.example.expensetracker.fragment.TransactionFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,9 +120,19 @@ class DashboardActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment).commit()
     }
 
+    /**
+     * Ensures that default categories exist in the database.
+     *
+     * Default categories are inserted only on the first app launch.
+     * A SharedPreferences flag prevents duplicate insertion on subsequent launches.
+     *
+     * Database operations are executed on the IO dispatcher.
+     *
+     * @param db App database instance
+     */
     private fun insertDefaultCategoriesIfNeeded(db: AppDatabase) {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        val isInserted = prefs.getBoolean("DEFAULT_CATEGORIES_INSERTED", false)
+        val prefs = getSharedPreferences(getString(R.string.app_prefs), MODE_PRIVATE)
+        val isInserted = prefs.getBoolean(getString(R.string.default_categories_inserted), false)
 
         if (isInserted) return
 
@@ -130,25 +140,35 @@ class DashboardActivity : AppCompatActivity() {
 
             val defaultCategories = listOf(
                 CategoryEntity(
-                    name = "Salary", iconRes = R.drawable.ic_food, color = Color.GREEN
+                    name = getString(R.string.salary),
+                    iconRes = R.drawable.ic_food,
+                    color = Color.GREEN
                 ),
                 CategoryEntity(
-                    name = "Gift", iconRes = R.drawable.ic_shopping, color = Color.MAGENTA
+                    name = getString(R.string.gift),
+                    iconRes = R.drawable.ic_shopping,
+                    color = Color.MAGENTA
                 ),
                 CategoryEntity(
-                    name = "Refund", iconRes = R.drawable.ic_travel, color = Color.CYAN
+                    name = getString(R.string.refund),
+                    iconRes = R.drawable.ic_travel,
+                    color = Color.CYAN
                 ),
                 CategoryEntity(
-                    name = "Investment", iconRes = R.drawable.ic_bill, color = Color.YELLOW
+                    name = getString(R.string.investment),
+                    iconRes = R.drawable.ic_bill,
+                    color = Color.YELLOW
                 ),
                 CategoryEntity(
-                    name = "Other", iconRes = R.drawable.ic_bill, color = Color.YELLOW
+                    name = getString(R.string.other),
+                    iconRes = R.drawable.ic_bill,
+                    color = Color.YELLOW
                 ),
-                )
+            )
 
             db.categoryDao().insertAll(defaultCategories)
 
-            prefs.edit().putBoolean("DEFAULT_CATEGORIES_INSERTED", true).apply()
+            prefs.edit().putBoolean(getString(R.string.default_categories_inserted), true).apply()
         }
     }
 }

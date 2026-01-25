@@ -10,28 +10,58 @@ import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.expensetracker.R
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.databinding.ActivityAddIncomeBinding
 import com.google.android.material.chip.Chip
+import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
+/**
+ * AddIncomeActivity
+ *
+ * This screen is used to add a new Income or Expense transaction.
+ *
+ * Features:
+ * - Select income or expense type
+ * - Choose category using ChipGroup
+ * - Add or delete custom categories
+ * - Select date and time using Material DatePicker & TimePicker
+ * - Save transaction details (amount, description, category, date-time)
+ */
 class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityAddIncomeBinding
-    private var type: String = "INCOME"
+    private var type: String = getString(R.string.income)
     private lateinit var db: AppDatabase
     private var selectedCategoryId: Int? = null
 
+    /**
+     * List of default categories that cannot be deleted by user.
+     */
+    private val defaultCategories = setOf(
+        getString(R.string.salary),
+        getString(R.string.gift),
+        getString(R.string.refund),
+        getString(R.string.investment),
+        getString(R.string.other)
+    )
 
+    /**
+     * Initializes the activity.
+     *
+     * - Sets up ViewBinding
+     * - Reads transaction type (INCOME / EXPENSE) from intent
+     * - Initializes database instance
+     * - Observes categories from database
+     * - Sets up UI and click listeners
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,35 +70,116 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         db = AppDatabase.getInstance(this)
         observeCategories()
 
-        type = intent.getStringExtra("TYPE") ?: "INCOME"
+        type = intent.getStringExtra(getString(R.string.type)) ?: getString(R.string.income)
 
         setupUI()
         setupClicks()
 
     }
+
+    /**
+     * Configures UI elements based on transaction type.
+     *
+     * - Updates title text
+     * - Updates save button text
+     * - Changes button color if needed
+     */
     private fun setupUI() {
-        if (type == "INCOME") {
-            binding.tvTitle.text = "Add Income"
-            binding.btnSaveIncome.text = "Save Income"
+        if (type == getString(R.string.income)) {
+            binding.tvTitle.text = getString(R.string.add_income)
+            binding.btnSaveIncome.text = getString(R.string.save_income)
             binding.btnSaveIncome.backgroundTintList =
                 ColorStateList.valueOf(getColor(R.color.black))
 
         } else {
-            binding.tvTitle.text = "Add Expense"
-            binding.btnSaveIncome.text = "Save Expense"
+            binding.tvTitle.text = getString(R.string.add_expense)
+            binding.btnSaveIncome.text = getString(R.string.save_expense)
             binding.btnSaveIncome.backgroundTintList =
                 ColorStateList.valueOf(getColor(R.color.black))
         }
     }
+
+    /**
+     * Observes category list from database using Flow.
+     *
+     * Automatically updates UI whenever categories change.
+     */
+    private fun observeCategories() {
+        lifecycleScope.launch {
+            db.categoryDao().getAllCategories().collect { categories ->
+                populateCategoryChips(categories)
+            }
+        }
+    }
+
+    /**
+     * Dynamically creates category chips and adds them to ChipGroup.
+     *
+     * @param categories List of CategoryEntity from database
+     *
+     * - Displays category name and icon
+     * - Allows single category selection
+     * - Stores selected category ID
+     */
+    private fun populateCategoryChips(categories: List<CategoryEntity>) {
+        binding.chipGroupCategory.removeAllViews()
+
+        categories.forEach { category ->
+            val chip = Chip(this).apply {
+                text = category.name
+                isCheckable = true
+                tag = category.id
+
+                chipIcon = getDrawable(category.iconRes)
+                chipBackgroundColor = ColorStateList.valueOf(category.color)
+
+                isChipIconVisible = true
+
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        // Selected category id
+                        selectedCategoryId = category.id
+                    }
+                }
+            }
+            binding.chipGroupCategory.addView(chip)
+        }
+    }
+
+    /**
+     * Attaches click listeners to all interactive UI elements.
+     */
     private fun setupClicks() {
         binding.btnSaveIncome.setOnClickListener(this)
         binding.tvAddCategory.setOnClickListener(this)
         binding.tvDeleteCategory.setOnClickListener(this)
         binding.lnrDate.setOnClickListener(this)
     }
+
+    /**
+     * Handles click events for all registered views.
+     *
+     * @param v The clicked view
+     */
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btnSaveIncome -> saveTransaction()
+            R.id.tvAddCategory -> showAddCategoryDialog()
+            R.id.tvDeleteCategory -> showDeleteCategoryDialog()
+            R.id.lnrDate -> showDatePicker()
+        }
+    }
+
+    /**
+     * Validates user input and prepares transaction data.
+     *
+     * - Reads amount and description
+     * - Determines transaction type (Income / Expense)
+     * - Intended to save transaction into database
+     */
     private fun saveTransaction() {
-        val amount = binding.etAmount.text.toString().toDoubleOrNull() ?: return
-        val desc = binding.etDescription.text.toString()
+        binding.etAmount.text.toString().toDoubleOrNull() ?: return
+        binding.etDescription.text.toString()
 
 //        val transactionType =
 //            if (type == "INCOME") TransactionType.INCOME else TransactionType.EXPENSE
@@ -76,6 +187,13 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         // save to DB using transactionType
     }
 
+    /**
+     * Displays dialog to add a new custom category.
+     *
+     * - Takes category name input
+     * - Inserts category into database
+     * - Uses default color and icon
+     */
     private fun showAddCategoryDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_category, null)
 
@@ -103,20 +221,20 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 dialog.dismiss()
             } else {
-                etCategory.error = "Required"
+                etCategory.error = getString(R.string.required)
             }
         }
 
         dialog.show()
     }
-    private val defaultCategories = setOf(
-        "Salary",
-        "Gift",
-        "Refund",
-        "Investment",
-        "Other"
-    )
 
+    /**
+     * Displays dialog to delete user-created categories.
+     *
+     * - Filters out default categories
+     * - Shows remaining categories in spinner
+     * - Deletes selected category from database
+     */
     private fun showDeleteCategoryDialog() {
         lifecycleScope.launch {
             val categories = db.categoryDao().getAllCategories().first()
@@ -128,9 +246,8 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
 
             if (deletableCategories.isEmpty()) {
                 AlertDialog.Builder(this@AddIncomeActivity)
-                    .setMessage("No custom categories to delete")
-                    .setPositiveButton("OK", null)
-                    .show()
+                    .setMessage(getString(R.string.no_custom_categories_to_delete))
+                    .setPositiveButton("OK", null).show()
                 return@launch
             }
 
@@ -142,14 +259,11 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             val adapter = android.widget.ArrayAdapter(
                 this@AddIncomeActivity,
                 android.R.layout.simple_spinner_item,
-                deletableCategories.map { it.name }
-            )
+                deletableCategories.map { it.name })
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
 
-            val dialog = AlertDialog.Builder(this@AddIncomeActivity)
-                .setView(dialogView)
-                .create()
+            val dialog = AlertDialog.Builder(this@AddIncomeActivity).setView(dialogView).create()
 
             btnCancel.setOnClickListener { dialog.dismiss() }
 
@@ -166,78 +280,48 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.btnSaveIncome -> saveTransaction()
-            R.id.tvAddCategory -> showAddCategoryDialog()
-            R.id.tvDeleteCategory -> showDeleteCategoryDialog()
-            R.id.lnrDate -> showDatePicker()
-        }
-    }
 
+    /**
+     * Opens Material Date Picker to select a date.
+     *
+     * After date selection, automatically opens Time Picker.
+     */
     private fun showDatePicker() {
 
-        val picker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Select date")
-            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-            .build()
+        val picker =
+            MaterialDatePicker.Builder.datePicker().setTitleText(getString(R.string.select_date))
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()).build()
 
-        picker.show(supportFragmentManager, "DATE_PICKER")
+        picker.show(supportFragmentManager, getString(R.string.date_picker))
 
         picker.addOnPositiveButtonClickListener { selectedDateMillis ->
             showTimePicker(selectedDateMillis)
         }
     }
+
+    /**
+     * Opens TimePicker dialog after date selection.
+     *
+     * @param selectedDateMillis Selected date in milliseconds
+     *
+     * Combines date and time and formats it as:
+     * "EEE, MMM d, h:mm a"
+     */
     private fun showTimePicker(selectedDateMillis: Long) {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = selectedDateMillis
 
         val timePicker = TimePickerDialog(
-            this,
-            { _, hour, minute ->
+            this, { _, hour, minute ->
                 calendar.set(Calendar.HOUR_OF_DAY, hour)
                 calendar.set(Calendar.MINUTE, minute)
 
-                val sdf = SimpleDateFormat("EEE, MMM d, h:mm a", Locale.getDefault())
+                val sdf =
+                    SimpleDateFormat(getString(R.string.eee_mmm_d_h_mm_a), Locale.getDefault())
                 binding.tvDateTime.text = sdf.format(calendar.time)
-            },
-            calendar.get(Calendar.HOUR_OF_DAY),
-            calendar.get(Calendar.MINUTE),
-            false
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false
         )
 
         timePicker.show()
     }
-
-
-    private fun observeCategories() {
-        lifecycleScope.launch {
-            db.categoryDao().getAllCategories().collect { categories ->
-                populateCategoryChips(categories)
-            }
-        }
-    }
-    private fun populateCategoryChips(categories: List<CategoryEntity>) {
-        binding.chipGroupCategory.removeAllViews()
-
-        categories.forEach { category ->
-            val chip = Chip(this).apply {
-                text = category.name
-                isCheckable = true
-                tag = category.id
-
-                chipIcon = getDrawable(category.iconRes)
-                isChipIconVisible = true
-
-                setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        // Selected category id
-                        selectedCategoryId = category.id
-                    }
-                }
-            }
-            binding.chipGroupCategory.addView(chip)
-        }
-    }
-
 }
