@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.expensetracker.R
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.CategoryEntity
+import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.ActivityAddIncomeBinding
 import com.google.android.material.chip.Chip
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 /**
@@ -87,6 +89,11 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
      * - Changes button color if needed
      */
     private fun setupUI() {
+        val sdf = SimpleDateFormat(
+            getString(R.string.eee_mmm_d_h_mm_a), Locale.getDefault()
+        )
+
+        binding.tvDateTime.text = sdf.format(Date())
         if (type == getString(R.string.income)) {
             binding.tvTitle.text = getString(R.string.add_income)
             binding.btnSaveIncome.text = getString(R.string.save_income)
@@ -156,6 +163,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         binding.tvAddCategory.setOnClickListener(this)
         binding.tvDeleteCategory.setOnClickListener(this)
         binding.lnrDate.setOnClickListener(this)
+        binding.imgBack.setOnClickListener(this)
     }
 
     /**
@@ -169,6 +177,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             R.id.tvAddCategory -> showAddCategoryDialog()
             R.id.tvDeleteCategory -> showDeleteCategoryDialog()
             R.id.lnrDate -> showDatePicker()
+            R.id.imgBack -> onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -180,13 +189,46 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
      * - Intended to save transaction into database
      */
     private fun saveTransaction() {
-        binding.etAmount.text.toString().toDoubleOrNull() ?: return
-        binding.etDescription.text.toString()
 
-//        val transactionType =
-//            if (type == "INCOME") TransactionType.INCOME else TransactionType.EXPENSE
+        val amountText = binding.etAmount.text.toString().trim()
+        val desc = binding.etDescription.text.toString().trim()
 
-        // save to DB using transactionType
+        // Amount validation
+        if (amountText.isEmpty()) {
+            binding.etAmount.error = getString(R.string.enter_amount)
+            binding.etAmount.requestFocus()
+            return
+        }
+
+        val amount = amountText.toDoubleOrNull()
+        if (amount == null || amount <= 0) {
+            binding.etAmount.error = getString(R.string.invalid_amount)
+            binding.etAmount.requestFocus()
+            return
+        }
+
+        // Description validation
+        if (desc.isEmpty()) {
+            binding.etDescription.error = getString(R.string.enter_description)
+            binding.etDescription.requestFocus()
+            return
+        }
+
+        val date = binding.tvDateTime.text.toString()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            db.transactionDao().insertTransaction(
+                TransactionEntity(
+                    amount = amount,
+                    desc = desc,
+                    type = type,
+                    categoryId = selectedCategoryId,
+                    date = date
+                )
+            )
+        }
+
+        onBackPressedDispatcher.onBackPressed()
     }
 
     /**

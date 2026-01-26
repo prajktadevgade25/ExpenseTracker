@@ -9,9 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.R
 import com.example.expensetracker.activity.AddIncomeActivity
 import com.example.expensetracker.data.db.AppDatabase
-import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.FragmentHomeBinding
-import com.example.expensetracker.ui.transaction.TransactionAdapter
+import com.example.expensetracker.ui.transaction.TransactionsAdapter
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -31,7 +30,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var db: AppDatabase
-    private lateinit var adapter: TransactionAdapter
+    private lateinit var adapter: TransactionsAdapter
 
     /**
      * Called after the fragment's view has been created.
@@ -50,11 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
         // Attach click listener
         binding.lnrAddIncome.setOnClickListener(this)
         binding.lnrAddExpense.setOnClickListener(this)
-        adapter =
-            TransactionAdapter(mutableListOf(), object : TransactionAdapter.TransactionListener {
-                override fun onEdit(transaction: TransactionEntity) {}
-                override fun onDelete(transaction: TransactionEntity) {}
-            })
+        adapter = TransactionsAdapter(mutableListOf())
 
         binding.rvRecent.layoutManager = LinearLayoutManager(requireContext())
         binding.rvRecent.adapter = adapter

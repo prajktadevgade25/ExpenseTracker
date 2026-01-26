@@ -11,7 +11,7 @@ import com.example.expensetracker.data.dao.TransactionDao
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.data.entity.TransactionEntity
 
-@Database(entities = [CategoryEntity::class, TransactionEntity::class], version = 3)
+@Database(entities = [CategoryEntity::class, TransactionEntity::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun categoryDao(): CategoryDao
@@ -30,7 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
             return INSTANCE!!
         }
 
-        private val MIGRATION_1_2 = object : Migration(2, 3) {
+        private val MIGRATION_1_2 = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "ALTER TABLE categories ADD COLUMN iconRes INTEGER NOT NULL DEFAULT 0"
