@@ -31,4 +31,11 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY date DESC LIMIT 5")
     fun getRecentTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE type = 'INCOME' ORDER BY date DESC")
+    fun getIncomeTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' ORDER BY date DESC")
+    fun getExpenseTransactions(): Flow<List<TransactionEntity>>
+
 }

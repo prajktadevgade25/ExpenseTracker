@@ -16,6 +16,7 @@ import com.example.expensetracker.databinding.ActivityDashboardBinding
 import com.example.expensetracker.fragment.CategoryFragment
 import com.example.expensetracker.fragment.HomeFragment
 import com.example.expensetracker.fragment.SettingsFragment
+import com.example.expensetracker.fragment.TransactionFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,6 +85,10 @@ class DashboardActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     loadFragment(HomeFragment())
+                    true
+                }
+                R.id.nav_transaction -> {
+                    loadFragment(TransactionFragment())
                     true
                 }
 
