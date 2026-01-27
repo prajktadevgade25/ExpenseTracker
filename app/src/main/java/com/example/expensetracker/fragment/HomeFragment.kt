@@ -49,6 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
         // Attach click listener
         binding.lnrAddIncome.setOnClickListener(this)
         binding.lnrAddExpense.setOnClickListener(this)
+        binding.lnrSeeAll.setOnClickListener(this)
         adapter = TransactionsAdapter(mutableListOf())
 
         binding.rvRecent.layoutManager = LinearLayoutManager(requireContext())
@@ -130,6 +131,13 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
                 val intent = Intent(requireContext(), AddIncomeActivity::class.java)
                 intent.putExtra(getString(R.string.type), getString(R.string.expense))
                 startActivity(intent)
+            }
+
+            R.id.lnrSeeAll -> {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, TransactionFragment())
+                    .addToBackStack(null)
+                    .commit()
             }
         }
     }
