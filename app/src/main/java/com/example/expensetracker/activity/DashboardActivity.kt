@@ -13,6 +13,7 @@ import com.example.expensetracker.R
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.databinding.ActivityDashboardBinding
+import com.example.expensetracker.fragment.AnalyticsFragment
 import com.example.expensetracker.fragment.CategoryFragment
 import com.example.expensetracker.fragment.HomeFragment
 import com.example.expensetracker.fragment.SettingsFragment
@@ -91,7 +92,10 @@ class DashboardActivity : AppCompatActivity() {
                     loadFragment(TransactionFragment())
                     true
                 }
-
+                R.id.nav_analytics -> {
+                    loadFragment(AnalyticsFragment())
+                    true
+                }
                 R.id.nav_categories -> {
                     loadFragment(CategoryFragment())
                     true
