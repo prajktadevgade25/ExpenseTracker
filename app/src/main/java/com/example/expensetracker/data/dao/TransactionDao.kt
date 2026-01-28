@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.expensetracker.data.model.CategoryTotal
 import com.example.expensetracker.data.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -38,4 +39,6 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE type = 'EXPENSE' ORDER BY date DESC")
     fun getExpenseTransactions(): Flow<List<TransactionEntity>>
 
+    @Query(" SELECT c.name AS categoryName, SUM(t.amount) AS total FROM transactions t INNER JOIN categories c ON t.categoryId = c.id WHERE t.type = 'EXPENSE' GROUP BY t.categoryId")
+    fun getExpenseByCategory(): Flow<List<CategoryTotal>>
 }

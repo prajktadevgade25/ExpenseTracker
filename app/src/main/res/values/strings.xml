@@ -34,4 +34,5 @@
     <string name="invalid_amount">Invalid amount</string>
     <string name="enter_description">Enter description</string>
     <string name="analytics">Analytics</string>
+    <string name="expense_by_category">Expense by Category</string>
 </resources>
