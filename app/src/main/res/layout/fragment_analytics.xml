@@ -9,6 +9,6 @@
     <!--Ui component for our pie chart-->
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"
-        android:layout_width="350dp"
-        android:layout_height="350dp" />
+        android:layout_width="400dp"
+        android:layout_height="400dp" />
 </LinearLayout>

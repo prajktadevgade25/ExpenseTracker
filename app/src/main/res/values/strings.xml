@@ -35,4 +35,22 @@
     <string name="enter_description">Enter description</string>
     <string name="analytics">Analytics</string>
     <string name="expense_by_category">Expense by Category</string>
+    <string name="expense_s">Expense</string>
+    <string name="income_s">Income</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="see_all">See all</string>
+    <string name="all">All</string>
+    <string name="incomes">Incomes</string>
+    <string name="expenses">Expenses</string>
+    <string name="what_is_this_income_for">What is this income for?</string>
+    <string name="delete">Delete</string>
+    <string name="add">Add</string>
+    <string name="ok">OK</string>
+    <string name="add_category">Add Category</string>
+    <string name="category_name">Category name</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_category">Delete Category</string>
+    <string name="export_data">Export Data</string>
+    <string name="export_as_pdf">Export as PDF</string>
 </resources>

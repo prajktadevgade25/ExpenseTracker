@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.expensetracker.R
 import com.example.expensetracker.data.db.AppDatabase
@@ -97,14 +98,10 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         if (type == getString(R.string.income)) {
             binding.tvTitle.text = getString(R.string.add_income)
             binding.btnSaveIncome.text = getString(R.string.save_income)
-            binding.btnSaveIncome.backgroundTintList =
-                ColorStateList.valueOf(getColor(R.color.black))
 
         } else {
             binding.tvTitle.text = getString(R.string.add_expense)
             binding.btnSaveIncome.text = getString(R.string.save_expense)
-            binding.btnSaveIncome.backgroundTintList =
-                ColorStateList.valueOf(getColor(R.color.black))
         }
     }
 
@@ -136,11 +133,13 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         categories.forEach { category ->
             val chip = Chip(this).apply {
                 text = category.name
+                setTextColor(Color.BLACK)
                 isCheckable = true
                 tag = category.id
 
                 chipIcon = getDrawable(category.iconRes)
-                chipBackgroundColor = ColorStateList.valueOf(category.color)
+                chipBackgroundColor =
+                    ColorStateList.valueOf(ContextCompat.getColor(context, category.color))
 
                 isChipIconVisible = true
 
@@ -258,7 +257,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
                     db.categoryDao().insertCategory(
                         CategoryEntity(
                             name = categoryName,
-                            color = Color.LTGRAY,
+                            color = R.color.light_purple,
                             iconRes = R.drawable.ic_other,
                         )
                     )
@@ -291,7 +290,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             if (deletableCategories.isEmpty()) {
                 AlertDialog.Builder(this@AddIncomeActivity)
                     .setMessage(getString(R.string.no_custom_categories_to_delete))
-                    .setPositiveButton("OK", null).show()
+                    .setPositiveButton(getString(R.string.ok), null).show()
                 return@launch
             }
 

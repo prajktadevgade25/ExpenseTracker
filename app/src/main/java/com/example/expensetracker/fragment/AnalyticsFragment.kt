@@ -3,17 +3,17 @@ package com.example.expensetracker.fragment
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.expensetracker.R
-import com.example.expensetracker.data.model.CategoryTotal
 import com.example.expensetracker.data.db.AppDatabase
+import com.example.expensetracker.data.model.CategoryTotal
 import com.example.expensetracker.databinding.FragmentAnalyticsBinding
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.launch
-import androidx.core.graphics.toColorInt
 
 /**
  * AnalyticsFragment
@@ -84,19 +84,21 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
             "#FFA726".toColorInt()
         )
         dataSet.valueTextColor = Color.WHITE
-        dataSet.valueTextSize = 12f
+        dataSet.valueTextSize = 16f
 
         val pieData = PieData(dataSet)
+        val legend = binding.pieChart.legend
 
         binding.pieChart.apply {
             this.data = pieData
             description.isEnabled = false
             isDrawHoleEnabled = true
+            legend.textSize = 10f
             holeRadius = 50f
             setEntryLabelColor(Color.BLACK)
-            setEntryLabelTextSize(10f)
+            setEntryLabelTextSize(12f)
             centerText = context.getString(R.string.expense_by_category)
-            setCenterTextSize(12f)
+            setCenterTextSize(14f)
             animateY(900)
             invalidate()
         }

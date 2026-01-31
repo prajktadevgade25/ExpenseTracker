@@ -1,8 +1,12 @@
 package com.example.expensetracker.ui.transaction
 
+import android.R
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expensetracker.data.entity.CategoryEntity
 import com.example.expensetracker.data.entity.TransactionEntity
@@ -59,8 +63,16 @@ class TransactionsAdapter(
         else "+ ₹${transaction.amount}"
 
         holder.binding.tvAmount.setTextColor(
-            if (transaction.type == "EXPENSE") Color.RED else Color.GREEN
+            if (transaction.type == "EXPENSE") "#F81F1F".toColorInt() else "#42A611".toColorInt()
         )
+
+        val bgColor = if (position % 2 == 0) {
+            "#FFFFFF".toColorInt()
+        } else {
+            "#FBF6FC".toColorInt()
+        }
+
+        holder.binding.root.setBackgroundColor(bgColor)
     }
 
     /**

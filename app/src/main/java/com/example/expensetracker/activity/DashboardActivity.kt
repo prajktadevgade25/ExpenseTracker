@@ -88,14 +88,17 @@ class DashboardActivity : AppCompatActivity() {
                     loadFragment(HomeFragment())
                     true
                 }
+
                 R.id.nav_transaction -> {
                     loadFragment(TransactionFragment())
                     true
                 }
+
                 R.id.nav_analytics -> {
                     loadFragment(AnalyticsFragment())
                     true
                 }
+
                 R.id.nav_categories -> {
                     loadFragment(CategoryFragment())
                     true
@@ -145,27 +148,27 @@ class DashboardActivity : AppCompatActivity() {
                 CategoryEntity(
                     name = getString(R.string.salary),
                     iconRes = R.drawable.ic_money,
-                    color = Color.GREEN
+                    color = R.color.light_purple
                 ),
                 CategoryEntity(
                     name = getString(R.string.gift),
                     iconRes = R.drawable.ic_gift,
-                    color = Color.MAGENTA
+                    color = R.color.light_purple
                 ),
                 CategoryEntity(
                     name = getString(R.string.refund),
                     iconRes = R.drawable.ic_refund,
-                    color = Color.CYAN
+                    color = R.color.light_purple
                 ),
                 CategoryEntity(
                     name = getString(R.string.investment),
                     iconRes = R.drawable.ic_investment,
-                    color = Color.YELLOW
+                    color = R.color.light_purple
                 ),
                 CategoryEntity(
                     name = getString(R.string.other),
                     iconRes = R.drawable.ic_other,
-                    color = Color.DKGRAY
+                    color = R.color.light_purple
                 ),
             )
 

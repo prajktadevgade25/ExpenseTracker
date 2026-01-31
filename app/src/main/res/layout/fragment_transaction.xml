@@ -1,57 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F6FA">
-
-    <!-- Header -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#6C63FF"
-        android:text="Transaction History"
-        android:textColor="@android:color/white"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <!-- Tabs -->
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroup"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:padding="12dp"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAll"
-            android:text="All"
-            app:checkedIconVisible="false"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:minHeight="56dp"
+            android:text="@string/all"
+            android:textColor="@color/chip_text"
+            android:textSize="20sp"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/chip_bg"
+            app:chipEndPadding="20dp"
+            app:chipStartPadding="20dp"
+            app:chipStrokeWidth="1dp" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipIncome"
-            android:text="Incomes"
-            app:checkedIconVisible="false"
-            android:checked="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:minHeight="56dp"
+            android:text="@string/incomes"
+            android:textColor="@color/chip_text"
+            android:textSize="20sp"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/chip_bg"
+            app:chipEndPadding="20dp"
+            app:chipStartPadding="20dp"
+            app:chipStrokeWidth="1dp" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipExpense"
-            android:text="Expenses"
-            app:checkedIconVisible="false"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:minHeight="56dp"
+            android:text="@string/expenses"
+            android:textColor="@color/chip_text"
+            android:textSize="20sp"
+            app:checkedIconVisible="false"
+            app:chipBackgroundColor="@color/chip_bg"
+            app:chipEndPadding="20dp"
+            app:chipStartPadding="20dp"
+            app:chipStrokeWidth="1dp" />
     </com.google.android.material.chip.ChipGroup>
 
     <!-- List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTransactions"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

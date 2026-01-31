@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="16dp">
 
     <LinearLayout
@@ -20,20 +21,23 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_purple_color"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Balance"
-                    android:textSize="14sp" />
+                    android:text="@string/total_balance"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tvBalance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹0"
+                    android:textColor="@color/white"
                     android:textSize="26sp"
                     android:textStyle="bold" />
 
@@ -55,20 +59,23 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_color"
                             android:orientation="vertical"
                             android:padding="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Income" />
+                                android:text="@string/income_s"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/tvIncome"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="₹0"
-                                android:textColor="@android:color/holo_green_dark"
+                                android:textColor="#42A611"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -85,20 +92,23 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_color"
                             android:orientation="vertical"
                             android:padding="16dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Expense" />
+                                android:text="@string/expense_s"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
 
                             <TextView
                                 android:id="@+id/tvExpense"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="₹0"
-                                android:textColor="@android:color/holo_red_dark"
+                                android:textColor="#F81F1F"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -128,10 +138,11 @@
                     android:id="@+id/lnrAddIncome"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
+                    android:background="@drawable/bg_light_color"
                     android:clickable="true"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -142,7 +153,8 @@
                         android:id="@+id/tvAddIcome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add Income"
+                        android:text="@string/add_income"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -160,9 +172,10 @@
                     android:id="@+id/lnrAddExpense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_color"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
+                    android:padding="16dp">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -173,7 +186,8 @@
                         android:id="@+id/tvAddExpense"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Add Expense"
+                        android:text="@string/add_expense"
+                        android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -185,35 +199,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Recent Transactions"
+                android:text="@string/recent_transactions"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/lnrSeeAll"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_eye"
-                    android:layout_marginRight="5dp"/>
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_eye" />
 
                 <TextView
                     android:id="@+id/tvSeeAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="See all"
-                    android:textSize="14sp"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:text="@string/see_all"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
             </LinearLayout>
 
 

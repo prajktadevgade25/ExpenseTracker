@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_light_color"
     android:orientation="vertical"
     android:padding="20dp">
 
@@ -9,36 +10,43 @@
         android:id="@+id/tvDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Category"
-        android:textSize="18sp"
+        android:text="@string/add_category"
+        android:textColor="@color/black"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etCategoryName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category name"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="12dp"
+        android:hint="@string/category_name"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
         android:gravity="end"
-        android:layout_marginTop="20dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnCancel"
-            android:text="Cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/light_purple"
+            android:text="@string/cancel"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/btnAdd"
-            android:text="Add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp" />
+            android:layout_marginStart="12dp"
+            android:backgroundTint="@color/purple"
+            android:text="@string/add"
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </LinearLayout>
