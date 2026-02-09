@@ -1,17 +1,25 @@
 package com.example.expensetracker.activity
 
+import android.Manifest
 import android.content.Intent
-import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.expensetracker.R
+import com.example.expensetracker.data.SavingReminderWorker
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.CategoryEntity
+import com.example.expensetracker.data.helper.NotificationHelper
 import com.example.expensetracker.databinding.ActivityDashboardBinding
 import com.example.expensetracker.fragment.AnalyticsFragment
 import com.example.expensetracker.fragment.CategoryFragment
@@ -21,6 +29,7 @@ import com.example.expensetracker.fragment.TransactionFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 /**
  * DashboardActivity is the main screen of the app.
@@ -37,6 +46,7 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var db: AppDatabase
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,6 +54,18 @@ class DashboardActivity : AppCompatActivity() {
         AppDatabase.getInstance(this).let { db ->
             insertDefaultCategoriesIfNeeded(db)
         }
+        ActivityCompat.requestPermissions(
+            this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101
+        )
+
+        NotificationHelper.createChannel(this)
+        val request = PeriodicWorkRequestBuilder<SavingReminderWorker>(
+            1, TimeUnit.DAYS
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "saving_reminder", ExistingPeriodicWorkPolicy.KEEP, request
+        )
         firebaseAuth = FirebaseAuth.getInstance()
 
         // Authentication check

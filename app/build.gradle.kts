@@ -62,4 +62,5 @@ dependencies {
     kapt("androidx.room:room-compiler:2.8.4")
     implementation("androidx.room:room-ktx:2.8.4")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.11.1")
 }

@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:padding="12dp"
+        android:padding="10dp"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
@@ -23,7 +23,7 @@
             android:minHeight="56dp"
             android:text="@string/all"
             android:textColor="@color/chip_text"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:checkedIconVisible="false"
             app:chipBackgroundColor="@color/chip_bg"
             app:chipEndPadding="20dp"
@@ -38,7 +38,7 @@
             android:minHeight="56dp"
             android:text="@string/incomes"
             android:textColor="@color/chip_text"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:checkedIconVisible="false"
             app:chipBackgroundColor="@color/chip_bg"
             app:chipEndPadding="20dp"
@@ -53,7 +53,7 @@
             android:minHeight="56dp"
             android:text="@string/expenses"
             android:textColor="@color/chip_text"
-            android:textSize="20sp"
+            android:textSize="16sp"
             app:checkedIconVisible="false"
             app:chipBackgroundColor="@color/chip_bg"
             app:chipEndPadding="20dp"

@@ -41,4 +41,7 @@ interface TransactionDao {
 
     @Query(" SELECT c.name AS categoryName, SUM(t.amount) AS total FROM transactions t INNER JOIN categories c ON t.categoryId = c.id WHERE t.type = 'EXPENSE' GROUP BY t.categoryId")
     fun getExpenseByCategory(): Flow<List<CategoryTotal>>
+
+    @Query("SELECT COUNT(*) > 0 FROM transactions WHERE date = :today AND type = 'INCOME'")
+    fun hasSavingsToday(today: String): Boolean
 }
