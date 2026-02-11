@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.R
 import com.example.expensetracker.activity.AddIncomeActivity
+import com.example.expensetracker.activity.TransationDetailsActivity
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.databinding.FragmentHomeBinding
 import com.example.expensetracker.ui.transaction.TransactionsAdapter
@@ -50,8 +51,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
         binding.lnrAddIncome.setOnClickListener(this)
         binding.lnrAddExpense.setOnClickListener(this)
         binding.lnrSeeAll.setOnClickListener(this)
-        adapter = TransactionsAdapter(mutableListOf())
-
+        adapter = TransactionsAdapter(mutableListOf()) { transaction ->
+            val intent = Intent(requireContext(), TransationDetailsActivity::class.java)
+            intent.putExtra("transactionId", transaction.id)
+            startActivity(intent)
+        }
         binding.rvRecent.layoutManager = LinearLayoutManager(requireContext())
         binding.rvRecent.adapter = adapter
 
@@ -135,8 +139,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), View.OnClickListener {
 
             R.id.lnrSeeAll -> {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer, TransactionFragment())
-                    .addToBackStack(null)
+                    .replace(R.id.fragmentContainer, TransactionFragment()).addToBackStack(null)
                     .commit()
             }
         }

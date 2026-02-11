@@ -1,5 +1,6 @@
 package com.example.expensetracker.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -7,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.R
 import com.example.expensetracker.activity.AddIncomeActivity
+import com.example.expensetracker.activity.TransationDetailsActivity
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.FragmentTransactionBinding
@@ -48,7 +50,12 @@ class TransactionFragment : Fragment(R.layout.fragment_transaction), View.OnClic
         binding = FragmentTransactionBinding.bind(view)
         db = AppDatabase.getInstance(requireContext())
 
-        adapter = TransactionsAdapter(mutableListOf())
+        adapter = TransactionsAdapter(mutableListOf()) { transaction ->
+            val intent = Intent(requireContext(), TransationDetailsActivity::class.java)
+            intent.putExtra("transactionId", transaction.id)
+            startActivity(intent)
+        }
+
         binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTransactions.adapter = adapter
 

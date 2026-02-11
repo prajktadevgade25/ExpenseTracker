@@ -54,4 +54,9 @@
     <string name="export_data">Export Data</string>
     <string name="export_as_pdf">Export as PDF</string>
     <string name="export">Export</string>
+    <string name="transaction_details">Transaction Details</string>
+    <string name="date">Date:</string>
+    <string name="category">Category:</string>
+    <string name="typee">Type:</string>
+    <string name="long_press_chart_elements_for_categoty_expenses">Long press chart elements for categoty expenses</string>
 </resources>

@@ -23,6 +23,7 @@ import com.example.expensetracker.databinding.ItemRecentTransactionBinding
  */
 class TransactionsAdapter(
     private val list: MutableList<Pair<TransactionEntity, CategoryEntity>>,
+    private val onItemClick: (TransactionEntity) -> Unit
 ) : RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {
 
     /**
@@ -73,6 +74,11 @@ class TransactionsAdapter(
         }
 
         holder.binding.root.setBackgroundColor(bgColor)
+
+        // CLICK LISTENER
+        holder.binding.root.setOnClickListener {
+            onItemClick(transaction)
+        }
     }
 
     /**

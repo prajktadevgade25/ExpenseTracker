@@ -1,18 +1,27 @@
 package com.example.expensetracker.fragment
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.expensetracker.R
+import com.example.expensetracker.activity.ExpensesByCategoryActivity
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.model.CategoryTotal
 import com.example.expensetracker.databinding.FragmentAnalyticsBinding
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.ChartTouchListener
+import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.launch
 
 /**
@@ -32,15 +41,83 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
 
     private lateinit var binding: FragmentAnalyticsBinding
     private lateinit var db: AppDatabase
+    private var selectedEntry: PieEntry? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentAnalyticsBinding.bind(view)
         db = AppDatabase.getInstance(requireContext())
+        binding.pieChart.isHighlightPerTapEnabled = true
 
         observeExpenseByCategory()
+        binding.pieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                selectedEntry = e as? PieEntry
+            }
+
+            override fun onNothingSelected() {
+                selectedEntry = null
+            }
+        })
+        binding.pieChart.onChartGestureListener = object : OnChartGestureListener {
+
+            override fun onChartLongPressed(me: MotionEvent?) {
+                selectedEntry?.let { entry ->
+                    //openCategoryDetails(entry.label)
+                    openExpensesByCategory(entry.label)
+                }
+            }
+
+            override fun onChartGestureStart(
+                me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?
+            ) {
+            }
+
+            override fun onChartGestureEnd(
+                me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?
+            ) {
+            }
+
+            override fun onChartSingleTapped(me: MotionEvent?) {}
+            override fun onChartDoubleTapped(me: MotionEvent?) {}
+            override fun onChartFling(
+                me1: MotionEvent?, me2: MotionEvent?, velocityX: Float, velocityY: Float
+            ) {
+            }
+
+            override fun onChartScale(
+                me: MotionEvent?, scaleX: Float, scaleY: Float
+            ) {
+            }
+
+            override fun onChartTranslate(
+                me: MotionEvent?, dX: Float, dY: Float
+            ) {
+            }
+        }
     }
+
+    private fun openExpensesByCategory(category: String) {
+
+        lifecycleScope.launch {
+
+            val list = db.transactionDao().getTransactionsByCategory(category)
+
+            if (list.isEmpty()) {
+                Toast.makeText(
+                    requireContext(), "No expenses found", Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+            val intent = Intent(
+                requireContext(), ExpensesByCategoryActivity::class.java
+            )
+            intent.putExtra("category", category)
+            startActivity(intent)
+        }
+    }
+
 
     /**
      * Observes category-wise expense data from the database.

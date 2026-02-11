@@ -4,9 +4,10 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.example.expensetracker.data.model.CategoryTotal
 import com.example.expensetracker.data.entity.TransactionEntity
+import com.example.expensetracker.data.model.CategoryTotal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -44,4 +45,21 @@ interface TransactionDao {
 
     @Query("SELECT COUNT(*) > 0 FROM transactions WHERE date = :today AND type = 'INCOME'")
     fun hasSavingsToday(today: String): Boolean
+
+    @Query(" SELECT t.* FROM transactions t INNER JOIN categories c ON t.categoryId = c.id WHERE c.name = :category AND type = 'EXPENSE' ORDER BY t.date DESC")
+    suspend fun getTransactionsByCategory(
+        category: String
+    ): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    suspend fun getById(id: Int): TransactionEntity?
+
+    @Query(" SELECT t.id, t.amount, t.`desc`, t.type, t.categoryId, t.date, c.name AS categoryName, c.iconRes As icon FROM transactions t LEFT JOIN categories c ON t.categoryId = c.id WHERE t.id = :id")
+    suspend fun getTransactionWithCategory(id: Int): TransactionWithCategory?
+
+    @Transaction
+    @Query("SELECT * FROM transactions WHERE categoryId IN ( SELECT id FROM categories WHERE name = :category) AND type = 'EXPENSE' ORDER BY date DESC")
+    suspend fun getTransactionsByCategory2(
+        category: String
+    ): List<TransactionWithCategory2>
 }

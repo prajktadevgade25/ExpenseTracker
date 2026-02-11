@@ -10,8 +10,18 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:text="@string/analytics"
+        android:textColor="@color/black"
         android:textSize="22sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/pieChart"
+        android:layout_margin="10dp"
+        android:text="@string/long_press_chart_elements_for_categoty_expenses"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
     <!--Ui component for our pie chart-->
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"
