@@ -1,11 +1,7 @@
 package com.example.expensetracker.ui.transaction
 
-import android.R
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expensetracker.data.entity.CategoryEntity
@@ -23,7 +19,9 @@ import com.example.expensetracker.databinding.ItemRecentTransactionBinding
  */
 class TransactionsAdapter(
     private val list: MutableList<Pair<TransactionEntity, CategoryEntity>>,
-    private val onItemClick: (TransactionEntity) -> Unit
+    private val onItemClick: (TransactionEntity) -> Unit,
+    private val onEditClick: (TransactionEntity) -> Unit,
+    private val onDeleteClick: (TransactionEntity) -> Unit
 ) : RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {
 
     /**
@@ -85,6 +83,10 @@ class TransactionsAdapter(
      * Returns the total number of items in the adapter.
      */
     override fun getItemCount(): Int = list.size
+    fun getItem(position: Int) = list[position].first
+    fun onEdit(tx: TransactionEntity) = onEditClick(tx)
+
+    fun onDelete(tx: TransactionEntity) = onDeleteClick(tx)
 
     /**
      * Updates the adapter data with a new list of transactions.

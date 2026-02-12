@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.databinding.ActivityExpensesByCategoryBinding
+import com.example.expensetracker.ui.transaction.TransactionSwipeCallback
 import com.example.expensetracker.ui.transaction.TransactionsAdapter
 import kotlinx.coroutines.launch
 
@@ -44,11 +46,35 @@ class ExpensesByCategoryActivity : AppCompatActivity() {
         categoryName = intent.getStringExtra("category")
 
         // Adapter click opens transaction details
-        adapter = TransactionsAdapter(mutableListOf()) { transaction ->
-            val intent = Intent(this, TransationDetailsActivity::class.java)
-            intent.putExtra("transactionId", transaction.id)
-            startActivity(intent)
-        }
+        adapter = TransactionsAdapter(
+            mutableListOf(),
+
+            // Item click → open details
+            onItemClick = { transaction ->
+                val intent = Intent(this, TransationDetailsActivity::class.java)
+                intent.putExtra("transactionId", transaction.id)
+                startActivity(intent)
+            },
+
+            // Edit click
+            onEditClick = { transaction ->
+                val intent = Intent(this, AddIncomeActivity::class.java)
+                intent.putExtra("transactionId", transaction.id)
+                intent.putExtra("type", transaction.type)
+                startActivity(intent)
+            },
+
+            // Delete click
+            onDeleteClick = { transaction ->
+                lifecycleScope.launch {
+                    db.transactionDao().deleteTransaction(transaction)
+                    // loadTransactions() // reload list
+                }
+            })
+
+        val swipeCallback = TransactionSwipeCallback(adapter)
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(binding.rvTransactions)
 
         binding.rvTransactions.layoutManager = LinearLayoutManager(this)
         binding.rvTransactions.adapter = adapter

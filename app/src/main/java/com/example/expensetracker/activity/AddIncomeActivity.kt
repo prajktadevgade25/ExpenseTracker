@@ -23,48 +23,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
-/**
- * AddIncomeActivity
- *
- * This screen is used to add a new Income or Expense transaction.
- *
- * Features:
- * - Select income or expense type
- * - Choose category using ChipGroup
- * - Add or delete custom categories
- * - Select date and time using Material DatePicker & TimePicker
- * - Save transaction details (amount, description, category, date-time)
- */
 class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
-    private lateinit var binding: ActivityAddIncomeBinding
-    lateinit var type: String
-    lateinit var defaultCategories: Set<String>
-    private lateinit var db: AppDatabase
-    private var selectedCategoryId: Int? = null
 
-    /**
-     * Initializes the activity.
-     *
-     * - Sets up ViewBinding
-     * - Reads transaction type (INCOME / EXPENSE) from intent
-     * - Initializes database instance
-     * - Observes categories from database
-     * - Sets up UI and click listeners
-     */
+    private lateinit var binding: ActivityAddIncomeBinding
+    private lateinit var db: AppDatabase
+
+    private var selectedCategoryId: Int? = null
+    private var transactionId: Int = 0
+    private var existingTransaction: TransactionEntity? = null
+    private lateinit var type: String
+    private lateinit var defaultCategories: Set<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         binding = ActivityAddIncomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        type = getString(R.string.income)
 
-        /**
-         * List of default categories that cannot be deleted by user.
-         */
+        db = AppDatabase.getInstance(this)
+
+        transactionId = intent.getIntExtra("transactionId", 0)
+        type = intent.getStringExtra(getString(R.string.type))
+            ?: getString(R.string.income)
+
         defaultCategories = setOf(
             getString(R.string.salary),
             getString(R.string.gift),
@@ -72,61 +56,40 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             getString(R.string.investment),
             getString(R.string.other)
         )
-        db = AppDatabase.getInstance(this)
-        observeCategories()
-
-        type = intent.getStringExtra(getString(R.string.type)) ?: getString(R.string.income)
 
         setupUI()
         setupClicks()
+        observeCategories()
 
+        if (transactionId != 0) {
+            loadTransactionForEdit()
+        }
     }
 
-    /**
-     * Configures UI elements based on transaction type.
-     *
-     * - Updates title text
-     * - Updates save button text
-     * - Changes button color if needed
-     */
     private fun setupUI() {
         val sdf = SimpleDateFormat(
-            getString(R.string.eee_mmm_d_h_mm_a), Locale.getDefault()
+            getString(R.string.eee_mmm_d_h_mm_a),
+            Locale.getDefault()
         )
-
         binding.tvDateTime.text = sdf.format(Date())
+
         if (type == getString(R.string.income)) {
             binding.tvTitle.text = getString(R.string.add_income)
             binding.btnSaveIncome.text = getString(R.string.save_income)
-
         } else {
             binding.tvTitle.text = getString(R.string.add_expense)
             binding.btnSaveIncome.text = getString(R.string.save_expense)
         }
     }
 
-    /**
-     * Observes category list from database using Flow.
-     *
-     * Automatically updates UI whenever categories change.
-     */
     private fun observeCategories() {
         lifecycleScope.launch {
-            db.categoryDao().getAllCategories().collect { categories ->
-                populateCategoryChips(categories)
+            db.categoryDao().getAllCategories().collect {
+                populateCategoryChips(it)
             }
         }
     }
 
-    /**
-     * Dynamically creates category chips and adds them to ChipGroup.
-     *
-     * @param categories List of CategoryEntity from database
-     *
-     * - Displays category name and icon
-     * - Allows single category selection
-     * - Stores selected category ID
-     */
     private fun populateCategoryChips(categories: List<CategoryEntity>) {
         binding.chipGroupCategory.removeAllViews()
 
@@ -139,24 +102,28 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
 
                 chipIcon = getDrawable(category.iconRes)
                 chipBackgroundColor =
-                    ColorStateList.valueOf(ContextCompat.getColor(context, category.color))
+                    ColorStateList.valueOf(
+                        ContextCompat.getColor(context, category.color)
+                    )
 
                 isChipIconVisible = true
 
                 setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        // Selected category id
                         selectedCategoryId = category.id
                     }
                 }
+
+                // Pre-select category when editing
+                if (category.id == selectedCategoryId) {
+                    isChecked = true
+                }
             }
+
             binding.chipGroupCategory.addView(chip)
         }
     }
 
-    /**
-     * Attaches click listeners to all interactive UI elements.
-     */
     private fun setupClicks() {
         binding.btnSaveIncome.setOnClickListener(this)
         binding.tvAddCategory.setOnClickListener(this)
@@ -165,11 +132,6 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         binding.imgBack.setOnClickListener(this)
     }
 
-    /**
-     * Handles click events for all registered views.
-     *
-     * @param v The clicked view
-     */
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnSaveIncome -> saveTransaction()
@@ -180,191 +142,174 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * Validates user input and prepares transaction data.
-     *
-     * - Reads amount and description
-     * - Determines transaction type (Income / Expense)
-     * - Intended to save transaction into database
-     */
     private fun saveTransaction() {
 
         val amountText = binding.etAmount.text.toString().trim()
         val desc = binding.etDescription.text.toString().trim()
 
-        // Amount validation
         if (amountText.isEmpty()) {
             binding.etAmount.error = getString(R.string.enter_amount)
-            binding.etAmount.requestFocus()
             return
         }
 
         val amount = amountText.toDoubleOrNull()
         if (amount == null || amount <= 0) {
             binding.etAmount.error = getString(R.string.invalid_amount)
-            binding.etAmount.requestFocus()
             return
         }
 
-        // Description validation
         if (desc.isEmpty()) {
             binding.etDescription.error = getString(R.string.enter_description)
-            binding.etDescription.requestFocus()
             return
         }
 
         val date = binding.tvDateTime.text.toString()
 
         lifecycleScope.launch(Dispatchers.IO) {
-            db.transactionDao().insertTransaction(
-                TransactionEntity(
+
+            if (existingTransaction != null) {
+                val updated = existingTransaction!!.copy(
                     amount = amount,
                     desc = desc,
                     type = type,
                     categoryId = selectedCategoryId,
                     date = date
                 )
-            )
+                db.transactionDao().updateTransaction(updated)
+
+                finish()
+            } else {
+                db.transactionDao().insertTransaction(
+                    TransactionEntity(
+                        amount = amount,
+                        desc = desc,
+                        type = type,
+                        categoryId = selectedCategoryId,
+                        date = date
+                    )
+                )
+            }
         }
 
-        onBackPressedDispatcher.onBackPressed()
+        finish()
     }
 
-    /**
-     * Displays dialog to add a new custom category.
-     *
-     * - Takes category name input
-     * - Inserts category into database
-     * - Uses default color and icon
-     */
     private fun showAddCategoryDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_category, null)
+        val view = layoutInflater.inflate(R.layout.dialog_add_category, null)
 
-        val etCategory = dialogView.findViewById<EditText>(R.id.etCategoryName)
-        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
-        val btnAdd = dialogView.findViewById<Button>(R.id.btnAdd)
+        val etCategory = view.findViewById<EditText>(R.id.etCategoryName)
+        val dialog = AlertDialog.Builder(this).setView(view).create()
 
-        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
-
-        btnCancel.setOnClickListener {
+        view.findViewById<Button>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
         }
 
-        btnAdd.setOnClickListener {
-            val categoryName = etCategory.text.toString().trim()
-            if (categoryName.isNotEmpty()) {
+        view.findViewById<Button>(R.id.btnAdd).setOnClickListener {
+            val name = etCategory.text.toString().trim()
+
+            if (name.isNotEmpty()) {
                 lifecycleScope.launch(Dispatchers.IO) {
                     db.categoryDao().insertCategory(
                         CategoryEntity(
-                            name = categoryName,
+                            name = name,
                             color = R.color.light_purple,
-                            iconRes = R.drawable.ic_other,
+                            iconRes = R.drawable.ic_other
                         )
                     )
                 }
                 dialog.dismiss()
-            } else {
-                etCategory.error = getString(R.string.required)
             }
         }
 
         dialog.show()
     }
 
-    /**
-     * Displays dialog to delete user-created categories.
-     *
-     * - Filters out default categories
-     * - Shows remaining categories in spinner
-     * - Deletes selected category from database
-     */
     private fun showDeleteCategoryDialog() {
         lifecycleScope.launch {
             val categories = db.categoryDao().getAllCategories().first()
 
-            // remove default categories
-            val deletableCategories = categories.filter {
+            val deletable = categories.filter {
                 it.name !in defaultCategories
             }
 
-            if (deletableCategories.isEmpty()) {
-                AlertDialog.Builder(this@AddIncomeActivity)
-                    .setMessage(getString(R.string.no_custom_categories_to_delete))
-                    .setPositiveButton(getString(R.string.ok), null).show()
-                return@launch
-            }
+            if (deletable.isEmpty()) return@launch
 
-            val dialogView = layoutInflater.inflate(R.layout.dialog_delete_category, null)
-            val spinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinnerCategories)
-            val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
-            val btnDelete = dialogView.findViewById<Button>(R.id.btnDelete)
+            val view = layoutInflater.inflate(R.layout.dialog_delete_category, null)
+            val spinner =
+                view.findViewById<android.widget.Spinner>(R.id.spinnerCategories)
 
-            val adapter = android.widget.ArrayAdapter(
+            spinner.adapter = android.widget.ArrayAdapter(
                 this@AddIncomeActivity,
                 android.R.layout.simple_spinner_item,
-                deletableCategories.map { it.name })
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
+                deletable.map { it.name }
+            )
 
-            val dialog = AlertDialog.Builder(this@AddIncomeActivity).setView(dialogView).create()
+            val dialog = AlertDialog.Builder(this@AddIncomeActivity)
+                .setView(view).create()
 
-            btnCancel.setOnClickListener { dialog.dismiss() }
-
-            btnDelete.setOnClickListener {
-                val selectedCategory = deletableCategories[spinner.selectedItemPosition]
-
+            view.findViewById<Button>(R.id.btnDelete).setOnClickListener {
+                val cat = deletable[spinner.selectedItemPosition]
                 lifecycleScope.launch(Dispatchers.IO) {
-                    db.categoryDao().deleteCategory(selectedCategory)
+                    db.categoryDao().deleteCategory(cat)
                 }
                 dialog.dismiss()
             }
+
+            view.findViewById<Button>(R.id.btnCancel)
+                .setOnClickListener { dialog.dismiss() }
 
             dialog.show()
         }
     }
 
-
-    /**
-     * Opens Material Date Picker to select a date.
-     *
-     * After date selection, automatically opens Time Picker.
-     */
     private fun showDatePicker() {
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
 
-        val picker =
-            MaterialDatePicker.Builder.datePicker().setTitleText(getString(R.string.select_date))
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()).build()
+        picker.show(supportFragmentManager, "date")
 
-        picker.show(supportFragmentManager, getString(R.string.date_picker))
-
-        picker.addOnPositiveButtonClickListener { selectedDateMillis ->
-            showTimePicker(selectedDateMillis)
+        picker.addOnPositiveButtonClickListener {
+            showTimePicker(it)
         }
     }
 
-    /**
-     * Opens TimePicker dialog after date selection.
-     *
-     * @param selectedDateMillis Selected date in milliseconds
-     *
-     * Combines date and time and formats it as:
-     * "EEE, MMM d, h:mm a"
-     */
-    private fun showTimePicker(selectedDateMillis: Long) {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = selectedDateMillis
+    private fun showTimePicker(dateMillis: Long) {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = dateMillis
 
-        val timePicker = TimePickerDialog(
-            this, { _, hour, minute ->
-                calendar.set(Calendar.HOUR_OF_DAY, hour)
-                calendar.set(Calendar.MINUTE, minute)
+        TimePickerDialog(
+            this,
+            { _, hour, minute ->
+                cal.set(Calendar.HOUR_OF_DAY, hour)
+                cal.set(Calendar.MINUTE, minute)
 
-                val sdf =
-                    SimpleDateFormat(getString(R.string.eee_mmm_d_h_mm_a), Locale.getDefault())
-                binding.tvDateTime.text = sdf.format(calendar.time)
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false
-        )
+                val sdf = SimpleDateFormat(
+                    getString(R.string.eee_mmm_d_h_mm_a),
+                    Locale.getDefault()
+                )
 
-        timePicker.show()
+                binding.tvDateTime.text = sdf.format(cal.time)
+            },
+            cal.get(Calendar.HOUR_OF_DAY),
+            cal.get(Calendar.MINUTE),
+            false
+        ).show()
+    }
+
+    private fun loadTransactionForEdit() {
+        lifecycleScope.launch {
+            existingTransaction =
+                db.transactionDao().getById(transactionId)
+
+            existingTransaction?.let { tx ->
+                binding.etAmount.setText(tx.amount.toString())
+                binding.etDescription.setText(tx.desc)
+                binding.tvDateTime.text = tx.date
+                type = tx.type
+
+                selectedCategoryId = tx.categoryId
+            }
+        }
     }
 }

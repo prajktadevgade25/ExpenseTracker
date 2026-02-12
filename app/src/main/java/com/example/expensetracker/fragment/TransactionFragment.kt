@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.expensetracker.R
 import com.example.expensetracker.activity.AddIncomeActivity
@@ -12,6 +13,7 @@ import com.example.expensetracker.activity.TransationDetailsActivity
 import com.example.expensetracker.data.db.AppDatabase
 import com.example.expensetracker.data.entity.TransactionEntity
 import com.example.expensetracker.databinding.FragmentTransactionBinding
+import com.example.expensetracker.ui.transaction.TransactionSwipeCallback
 import com.example.expensetracker.ui.transaction.TransactionsAdapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -50,11 +52,35 @@ class TransactionFragment : Fragment(R.layout.fragment_transaction), View.OnClic
         binding = FragmentTransactionBinding.bind(view)
         db = AppDatabase.getInstance(requireContext())
 
-        adapter = TransactionsAdapter(mutableListOf()) { transaction ->
-            val intent = Intent(requireContext(), TransationDetailsActivity::class.java)
-            intent.putExtra("transactionId", transaction.id)
-            startActivity(intent)
-        }
+        adapter = TransactionsAdapter(
+            mutableListOf(),
+
+            // Item click → open details
+            onItemClick = { transaction ->
+                val intent = Intent(requireContext(), TransationDetailsActivity::class.java)
+                intent.putExtra("transactionId", transaction.id)
+                startActivity(intent)
+            },
+
+            // Edit click
+            onEditClick = { transaction ->
+                val intent = Intent(requireContext(), AddIncomeActivity::class.java)
+                intent.putExtra("transactionId", transaction.id)
+                intent.putExtra("type", transaction.type)
+                startActivity(intent)
+            },
+
+            // Delete click
+            onDeleteClick = { transaction ->
+                lifecycleScope.launch {
+                    db.transactionDao().deleteTransaction(transaction)
+                    // loadTransactions() // reload list
+                }
+            })
+
+        val swipeCallback = TransactionSwipeCallback(adapter)
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(binding.rvTransactions)
 
         binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTransactions.adapter = adapter

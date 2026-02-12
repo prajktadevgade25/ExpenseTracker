@@ -1,5 +1,6 @@
 package com.example.expensetracker.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -56,8 +57,12 @@ class TransationDetailsActivity : AppCompatActivity() {
         }
 
         binding.btnEdit.setOnClickListener {
-            // TODO: Open edit transaction screen
+            editTransaction()
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        loadTransaction()
     }
 
     /**
@@ -101,15 +106,31 @@ class TransationDetailsActivity : AppCompatActivity() {
     private fun deleteTransaction() {
         lifecycleScope.launch {
 
-            // TODO: Enable deletion when DAO method is confirmed
-            // val tx = db.transactionDao().getById(transactionId)
-            // db.transactionDao().deleteTransaction(tx)
+            val tx = db.transactionDao().getById(transactionId)
 
-            Toast.makeText(
-                this@TransationDetailsActivity, "Transaction deleted", Toast.LENGTH_SHORT
-            ).show()
+            if (tx != null) {
+                db.transactionDao().deleteTransaction(tx)
 
-            finish()
+                Toast.makeText(
+                    this@TransationDetailsActivity,
+                    "Transaction deleted",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                finish()
+            } else {
+                Toast.makeText(
+                    this@TransationDetailsActivity,
+                    "Transaction not found",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
+    private fun editTransaction() {
+        val intent = Intent(this, AddIncomeActivity::class.java)
+        intent.putExtra("transactionId", transactionId)
+        startActivity(intent)
+    }
+
 }
