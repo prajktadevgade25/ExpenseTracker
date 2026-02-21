@@ -7,6 +7,7 @@ import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -46,6 +47,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), View.OnClickListe
 
         binding.btnLogout.setOnClickListener(this)
         binding.btnExport.setOnClickListener(this)
+        binding.btnTerms.setOnClickListener(this)
+        binding.btnPrivacyPolicy.setOnClickListener(this)
     }
 
     /**
@@ -70,6 +73,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), View.OnClickListe
         when (view?.id) {
             R.id.btnLogout -> logoutUser()
             R.id.btnExport -> showExportDialog()
+            R.id.btnTerms -> showContentDialog(
+                title = getString(R.string.terms_of_service),
+                message = getString(R.string.terms_content)
+            )
+            R.id.btnPrivacyPolicy -> showContentDialog(
+                title = getString(R.string.privacy_policy),
+                message = getString(R.string.privacy_content)
+            )
         }
     }
 
@@ -210,5 +221,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), View.OnClickListe
                     .show()
             }
         }
+    }
+    private fun showContentDialog(title: String, message: String) {
+        val view = layoutInflater.inflate(R.layout.dialog_content, null)
+        val textView = view.findViewById<TextView>(R.id.tvContent)
+        textView.text = message
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setView(view)
+            .setPositiveButton("Close") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        dialog.show()
     }
 }

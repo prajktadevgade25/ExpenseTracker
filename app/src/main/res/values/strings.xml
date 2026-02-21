@@ -59,4 +59,16 @@
     <string name="category">Category:</string>
     <string name="typee">Type:</string>
     <string name="long_press_chart_elements_for_categoty_expenses">Long press chart elements for categoty expenses</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_content">
+    \n 1. You agree to use this app responsibly.\n
+    2. This app is provided as-is.\n
+    3. We are not responsible for data loss.\n
+    </string>
+    <string name="privacy_content">
+    \n 1. We respect your privacy.\n
+    2. No personal data is shared with third parties.\n
+    3. Your data stays on your device.\n
+    </string>
 </resources>
