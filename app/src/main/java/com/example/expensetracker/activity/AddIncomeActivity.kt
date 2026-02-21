@@ -23,7 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -68,7 +70,7 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun setupUI() {
         val sdf = SimpleDateFormat(
-            getString(R.string.eee_mmm_d_h_mm_a),
+            "dd-MM-yyyy HH:mm:ss",
             Locale.getDefault()
         )
         binding.tvDateTime.text = sdf.format(Date())
@@ -283,13 +285,18 @@ class AddIncomeActivity : AppCompatActivity(), View.OnClickListener {
             { _, hour, minute ->
                 cal.set(Calendar.HOUR_OF_DAY, hour)
                 cal.set(Calendar.MINUTE, minute)
+                cal.set(Calendar.SECOND, 0)
 
-                val sdf = SimpleDateFormat(
-                    getString(R.string.eee_mmm_d_h_mm_a),
+                // DB format
+                val dbFormat = SimpleDateFormat(
+                    "dd-MM-yyyy HH:mm:ss",
                     Locale.getDefault()
                 )
 
-                binding.tvDateTime.text = sdf.format(cal.time)
+                val formattedDateTime = dbFormat.format(cal.time)
+
+                // Save or display
+                binding.tvDateTime.text = formattedDateTime
             },
             cal.get(Calendar.HOUR_OF_DAY),
             cal.get(Calendar.MINUTE),

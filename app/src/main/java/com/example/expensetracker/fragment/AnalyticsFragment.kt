@@ -3,6 +3,7 @@ package com.example.expensetracker.fragment
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
@@ -22,7 +23,12 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.ChartTouchListener
 import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * AnalyticsFragment
@@ -42,6 +48,9 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
     private lateinit var binding: FragmentAnalyticsBinding
     private lateinit var db: AppDatabase
     private var selectedEntry: PieEntry? = null
+    private var fromDateMillis: Long = 0L
+    private var toDateMillis: Long = 0L
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,6 +60,7 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
         binding.pieChart.isHighlightPerTapEnabled = true
 
         observeExpenseByCategory()
+        setDefaultDates()
         binding.pieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
                 selectedEntry = e as? PieEntry
@@ -96,7 +106,92 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
             ) {
             }
         }
+        binding.tvFromDate.setOnClickListener {
+            openDatePicker { millis, text ->
+                fromDateMillis = millis
+                binding.txtFromDate.text = text
+                applyDateFilter()
+            }
+        }
+
+        binding.tvToDate.setOnClickListener {
+            openDatePicker { millis, text ->
+                toDateMillis = millis
+                binding.txtToDate.text = text
+                applyDateFilter()
+            }
+        }
+
     }
+
+    private fun setDefaultDates() {
+        val cal = Calendar.getInstance()
+
+        // TO date = current time
+        toDateMillis = cal.timeInMillis
+
+        // FROM date = start of today
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        fromDateMillis = cal.timeInMillis
+
+        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        lifecycleScope.launch {
+            db.transactionDao().getSmallestDate().collect { dateStr ->
+                dateStr?.let {
+                    val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                    val millis = sdf.parse(it)?.time ?: System.currentTimeMillis()
+
+                    binding.txtFromDate.text = sdf.format(Date(millis))
+                }
+            }
+        }
+
+
+        binding.txtToDate.text = sdf.format(Date(toDateMillis))
+
+        applyDateFilter()
+    }
+
+    private fun openDatePicker(onSelected: (Long, String) -> Unit) {
+        val picker = MaterialDatePicker.Builder.datePicker().build()
+
+        picker.show(parentFragmentManager, "DATE")
+
+        picker.addOnPositiveButtonClickListener { millis ->
+            val displayFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            val dateText = displayFormat.format(Date(millis))
+            onSelected(millis, dateText)
+        }
+    }
+
+    private fun applyDateFilter() {
+        if (fromDateMillis == 0L || toDateMillis == 0L) return
+
+        lifecycleScope.launch {
+            val list = db.transactionDao().getAllExpenseTransactions()
+
+            val sdf = SimpleDateFormat(
+                "dd-MM-yyyy HH:mm:ss", Locale.getDefault()
+            )
+
+            val filtered = list.filter { tx ->
+                val time = sdf.parse(tx.date)?.time ?: 0L
+                time in fromDateMillis..(toDateMillis + 86400000)
+            }
+
+            val grouped = filtered.groupBy { it.categoryName ?: "Other" }.map { (category, items) ->
+                CategoryTotal(
+                    categoryName = category, total = items.sumOf { it.amount })
+            }
+
+            setupPieChart(grouped)
+        }
+    }
+
 
     private fun openExpensesByCategory(category: String) {
 

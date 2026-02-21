@@ -62,4 +62,16 @@ interface TransactionDao {
     suspend fun getTransactionsByCategory2(
         category: String
     ): List<TransactionWithCategory2>
+
+    @Query("SELECT c.name as categoryName, SUM(t.amount) as total FROM transactions t LEFT JOIN categories c ON t.categoryId = c.id WHERE t.type = 'EXPENSE' AND date BETWEEN :from AND :to GROUP BY c.name")
+    suspend fun getExpenseByCategoryBetween(
+        from: String, to: String
+    ): List<CategoryTotal>
+
+    @Query("SELECT t.id, t.amount, t.`desc`, t.type, t.categoryId, t.date, c.name AS categoryName, c.iconRes AS icon FROM transactions t LEFT JOIN categories c ON t.categoryId = c.id WHERE t.type = 'EXPENSE'")
+    suspend fun getAllExpenseTransactions(): List<TransactionWithCategory>
+
+    @Query("SELECT date FROM transactions ORDER BY date ASC LIMIT 1")
+    fun getSmallestDate(): Flow<String?>
+
 }
