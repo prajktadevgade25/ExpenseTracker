@@ -137,23 +137,20 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
         cal.set(Calendar.MILLISECOND, 0)
         fromDateMillis = cal.timeInMillis
 
-        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
         lifecycleScope.launch {
             db.transactionDao().getSmallestDate().collect { dateStr ->
                 dateStr?.let {
                     val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
                     val millis = sdf.parse(it)?.time ?: System.currentTimeMillis()
-
+                    fromDateMillis = millis
                     binding.txtFromDate.text = sdf.format(Date(millis))
+                    binding.txtToDate.text = sdf.format(Date(toDateMillis))
+                    applyDateFilter()
                 }
             }
         }
 
 
-        binding.txtToDate.text = sdf.format(Date(toDateMillis))
-
-        applyDateFilter()
     }
 
     private fun openDatePicker(onSelected: (Long, String) -> Unit) {
