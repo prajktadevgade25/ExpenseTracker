@@ -29,7 +29,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/logout" />
+            android:text="@string/logout"
+            android:backgroundTint="@color/purple"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnExport"
@@ -39,7 +43,10 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/export"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/purple"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnTerms"
@@ -49,7 +56,10 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/terms_of_service"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/purple"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/btnPrivacyPolicy"
@@ -59,7 +69,10 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="@string/privacy_policy"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/purple"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
     </LinearLayout>
 
