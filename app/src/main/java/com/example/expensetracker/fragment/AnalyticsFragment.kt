@@ -236,6 +236,7 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
      * - Applies colors and styling
      * - Animates and refreshes the chart
      */
+/*
     private fun setupPieChart(data: List<CategoryTotal>) {
 
         val entries = data.map {
@@ -268,6 +269,66 @@ class AnalyticsFragment : Fragment(R.layout.fragment_analytics) {
             setEntryLabelTextSize(12f)
             centerText = context.getString(R.string.expense_by_category)
             setCenterTextSize(14f)
+            animateY(900)
+            invalidate()
+        }
+    }
+*/
+    private fun setupPieChart(data: List<CategoryTotal>) {
+
+        val entries = data.map {
+            PieEntry(it.total.toFloat(), it.categoryName)
+        }
+
+        val dataSet = PieDataSet(entries, "")
+        dataSet.colors = listOf(
+            "#EF5350".toColorInt(),
+            "#AB47BC".toColorInt(),
+            "#5C6BC0".toColorInt(),
+            "#29B6F6".toColorInt(),
+            "#66BB6A".toColorInt(),
+            "#FFCA28".toColorInt(),
+            "#FFA726".toColorInt()
+        )
+
+        dataSet.valueTextColor = Color.WHITE
+        dataSet.valueTextSize = 14f
+
+        val pieData = PieData(dataSet)
+
+        binding.pieChart.apply {
+
+            this.data = pieData
+
+            setUsePercentValues(true)
+
+            pieData.setValueFormatter(
+                com.github.mikephil.charting.formatter.PercentFormatter(this)
+            )
+
+            description.isEnabled = false
+            isDrawHoleEnabled = true
+            setEntryLabelColor(Color.BLACK)
+            setEntryLabelTextSize(12f)
+
+            centerText = getString(R.string.expense_by_category)
+            setCenterTextSize(14f)
+            legend.apply {
+                isEnabled = true
+                verticalAlignment = com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.TOP
+                horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.LEFT
+                orientation = com.github.mikephil.charting.components.Legend.LegendOrientation.VERTICAL
+                setDrawInside(false)
+                textSize = 14f
+
+                // ✅ Correct spacing properties
+                xEntrySpace = 10f   // space between legend entries horizontally
+                yEntrySpace = 2f    // space between legend items vertically
+                formToTextSpace = 8f // space between color box and text
+                xOffset = 10f       // left margin spacing
+                yOffset = 4f        // top margin spacing
+            }
+
             animateY(900)
             invalidate()
         }
