@@ -60,7 +60,8 @@
             android:id="@+id/imgCategory"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:layout_marginTop="24dp"
+            android:layout_gravity="center"
+            android:layout_margin="20dp"
             android:padding="20dp"
             android:src="@drawable/ic_category" />
     </LinearLayout>
@@ -73,7 +74,7 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <!-- Category -->
@@ -84,7 +85,7 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="italic" />
 
     <!-- Amount -->
@@ -133,6 +134,12 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/darker_gray" />
     <!-- Category -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -155,6 +162,12 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/darker_gray" />
     <!-- Date -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -177,4 +190,10 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/darker_gray" />
 </LinearLayout>
