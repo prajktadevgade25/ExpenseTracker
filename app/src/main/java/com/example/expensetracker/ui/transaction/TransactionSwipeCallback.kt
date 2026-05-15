@@ -28,5 +28,6 @@ class TransactionSwipeCallback(
                 adapter.notifyItemChanged(position)
             }
             .show()
+
     }
 }
